@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ERA5 Web Viz (NetCDF)</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Local fallback for offline use -->
+  <link rel="stylesheet" href="vendor/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="topbar">
+    <h2>ERA5 Web 可视化器（仅 NetCDF）</h2>
+    <div id="status" style="display:inline-block; margin-left:12px; color:#444; font-size:0.9em"></div>
+    <input id="fileInput" type="file" accept=".nc,.json" />
+    <label for="plotSelect">图表类型</label>
+    <select id="plotSelect">
+      <option value="isobars">等压线分布图</option>
+      <option value="height_temp">高度等压线与等温线叠加图</option>
+      <option value="composite">500hPa/850hPa 三要素叠加图</option>
+    </select>
+    <!-- Per-element selectors for composite mode -->
+    <div id="compositeControls" style="display:inline-block; margin-left:8px;">
+      <label for="geo500Var">500hPa 高度:</label>
+      <select id="geo500Var"></select>
+      <label for="geo500Level">层:</label>
+      <select id="geo500Level"></select>
+      <label for="temp500Var">500hPa 温度:</label>
+      <select id="temp500Var"></select>
+      <label for="temp500Level">层:</label>
+      <select id="temp500Level"></select>
+      <label for="u850Var">850hPa U:</label>
+      <select id="u850Var"></select>
+      <label for="v850Var">850hPa V:</label>
+      <select id="v850Var"></select>
+      <label for="wind850Level">层:</label>
+      <select id="wind850Level"></select>
+      <label><input type="checkbox" id="temp500Shading" checked /> 温度着色</label>
+    </div>
+    <select id="projSelect">
+      <option value="Eurasia">Eurasia (Lambert)</option>
+      <option value="China">China (Lambert)</option>
+      <option value="NorthPolar">North Polar (Stereographic)</option>
+    </select>
+    <button id="drawBtn">生成图表</button>
+    <button id="exportBtn">导出 PNG</button>
+    <button id="makePicBtn">上传并生成图片</button>
+  </div>
+
+  <div id="map"></div>
+
+  <!-- Prefer local vendor files if present (see vendor/download_vendors.ps1) -->
+  <script>
+    function vendorPath(name, cdn) {
+      const local = 'vendor/' + name;
+      try {
+        // quick check via fetch - sync not allowed, so we fall back to CDN by default
+      } catch(e){}
+      return local;
+    }
+  </script>
+  <script src="vendor/netcdfjs.min.js"></script>
+  <script>
+    // Ensure older code that expects `NetCDFReader` global works with this bundled netcdfjs
+    try {
+      if (typeof window.NetCDFReader === 'undefined') {
+        if (typeof window.netcdfjs !== 'undefined') {
+          // try common export shapes
+          if (typeof window.netcdfjs === 'function') {
+            window.NetCDFReader = window.netcdfjs;
+          } else if (window.netcdfjs && typeof window.netcdfjs.default !== 'undefined') {
+            window.NetCDFReader = window.netcdfjs.default;
+          } else if (window.netcdfjs && typeof window.netcdfjs.NetCDFReader !== 'undefined') {
+            window.NetCDFReader = window.netcdfjs.NetCDFReader;
+          } else {
+            // fallback: assign module object as constructor (some bundles export class directly)
+            window.NetCDFReader = window.netcdfjs;
+          }
+        }
+      }
+    } catch(e) { console.warn('netcdfjs -> NetCDFReader shim failed', e); }
+  </script>
+  <script src="vendor/d3.v7.min.js"></script>
+  <script src="vendor/d3-contour.v2.min.js"></script>
+  <script src="vendor/leaflet.js"></script>
+  <script src="vendor/proj4.js"></script>
+  <script src="vendor/proj4leaflet.js"></script>
+  <!-- html2canvas 用于将地图导出为 PNG -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

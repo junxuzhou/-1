@@ -1,0 +1,9 @@
+body { margin:0; font-family: Arial, Helvetica, sans-serif; }
+#topbar { padding:8px; background:#0b3d91; color:white; display:flex; gap:8px; align-items:center; }
+#topbar h2 { margin:0; font-size:16px; }
+#map { width:100vw; height:calc(100vh - 56px); }
+select, input, button { padding:6px; font-size:13px; }
+button { background:#ff8c00; border: none; color:white; cursor:pointer; }
+button:disabled { opacity:0.6; cursor:default }
+
+.legend { position: absolute; right:10px; bottom:10px; background:rgba(255,255,255,0.9); padding:8px; border-radius:4px; font-size:12px }
